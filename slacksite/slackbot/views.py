@@ -2,12 +2,15 @@
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from db_work import *
+from db_utils import *
 
 
 @csrf_exempt
 def posting(request):
     r = request.POST
-    insert_user_db(r)
-    process_request(r)
+    user_id = r.get('user_id')
+    user_name = r.get('user_name')
+    text = r.get('text')
+    insert_user_db(user_id, user_name)
+    process_request(user_id, text)
     return HttpResponse(str(request))
