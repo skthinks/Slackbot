@@ -11,9 +11,9 @@ def update_offence_db(user_id, message):
     offence = ""
     if "leaving" in message:
         offence = "leaving_early"
-    elif ("reaching" in message 
-            or "in by" in message 
-            or "be in" in message):
+    elif ("reaching" in message or
+          "in by" in message or
+          "be in" in message):
         offence = "come_late"
     elif "leave" in message:
         offence = "on_leave"
