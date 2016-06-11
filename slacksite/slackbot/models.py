@@ -2,14 +2,13 @@ from __future__ import unicode_literals
 
 from django.db import models
 
-# Create your models here.
+
 class User(models.Model):
+    user_id = models.CharField(primary_key=True, max_length=30)
     user_name = models.CharField(max_length=30)
-    user_id = models.CharField(max_length=30)
 
 
-class Leaderboards(models.Model):
-    user_id = models.CharField(max_length=30)
-    leave_early = models.IntegerField()
-    arrive_late = models.IntegerField()
-    on_leave = models.IntegerField()
+class OffenceLog(models.Model):
+    user = models.ForeignKey('User')
+    timestamp = models.DateField(auto_now_add=True)
+    offence_type = models.CharField(max_length=30)
