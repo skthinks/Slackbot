@@ -22,8 +22,3 @@ def update_offence_db(user_id, message):
     user = User.objects.get(user_id=user_id)
     new_entry = OffenceLog(user=user, offence_type=offence)
     new_entry.save()
-
-
-def process_request(userid, message):
-    message = message.lower()
-    update_offence_db(userid, message)
