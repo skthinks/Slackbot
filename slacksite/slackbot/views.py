@@ -1,11 +1,11 @@
 from datetime import date, timedelta
 
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from db_utils import *
 from models import User
-import webpage_utils
 
 
 @csrf_exempt
@@ -14,11 +14,11 @@ def posting(request):
     user_id = r.get('user_id')
     user_name = r.get('user_name')
     text = r.get('text')
-    new_user, created = User.objects.get_or_create(user_id=user_id, 
+    user, created = User.objects.get_or_create(user_id=user_id,
         user_name=user_name)
-    new_user.save()
+    user.save()
     update_offence_db(user_id, text)
-    return HttpResponse(str(request))
+    return HttpResponse()
 
 
 def get_search_param(req):
@@ -31,25 +31,22 @@ def get_search_param(req):
 def leaderboard(request):
     user_list = OffenceLog.objects.values('user').distinct()
     data_span = get_search_param(request)
-    enddate = date.today()
-    what_to = enddate.weekday()
+    end_date = date.today()
+    what_to = end_date.weekday()
     if data_span == "monthly":
-        startdate = enddate.replace(day=1)
+        startdate = end_date.replace(day=1)
     else:
-        startdate = enddate - timedelta(days=what_to)
-    leader = ""
+        startdate = end_date - timedelta(days=what_to)
+    leaderboard = []
     for user in user_list:
+        leader = {}
         name_obj = User.objects.get(user_id=user['user'])
-        on_leave = OffenceLog.objects.all().filter(user=user['user'],
-            offence_type="on_leave", timestamp__range=[startdate, enddate])
-        arrive_late = OffenceLog.objects.all().filter(user=user['user'], offence_type="come_late")
-        leave_early = OffenceLog.objects.all().filter(user=user['user'], offence_type="leaving_early")
-        leader += ('<tr style="color:blue;">' +
-            "<td>" + name_obj.user_name + "</td> " +
-            "<td>" + str(len(leave_early)) + "</td>" +
-            "<td>" + str(len(arrive_late)) + "</td>" +
-            "<td>" + str(len(on_leave)) + "</td>>" +
-            "</tr>"
-        )
-    return_page = "%s%s%s" % (webpage_utils.PAGE_HEADER, leader, webpage_utils.PAGE_FOOTER)
-    return HttpResponse(return_page)
+        leader['name'] = name_obj.user_name
+        leader['on_leave'] = len(OffenceLog.objects.all().filter(user=user['user'],
+            offence_type="on_leave", timestamp__range=[startdate, end_date]))
+        leader['arrive_late'] = len(OffenceLog.objects.all().filter(user=user['user'],
+            offence_type="come_late", timestamp__range=[startdate, end_date]))
+        leader['leave_early'] = len(OffenceLog.objects.all().filter(user=user['user'],
+            offence_type="leaving_early", timestamp__range=[startdate, end_date]))
+        leaderboard.append(leader)
+    return JsonResponse(leaderboard, safe=False)

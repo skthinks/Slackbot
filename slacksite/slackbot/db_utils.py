@@ -1,5 +1,6 @@
 from models import User, OffenceLog
 
+
 def update_offence_db(user_id, message):
     message = message.lower()
     offence = ""
