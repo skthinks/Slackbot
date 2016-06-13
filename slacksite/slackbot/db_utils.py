@@ -1,11 +1,5 @@
 from models import User, OffenceLog
 
-
-def insert_user_db(username, userid):
-    new_user, created = User.objects.get_or_create(user_name=username, user_id=userid)
-    new_user.save()
-
-
 def update_offence_db(user_id, message):
     message = message.lower()
     offence = ""
