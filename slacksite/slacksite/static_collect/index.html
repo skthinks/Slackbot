@@ -24,9 +24,10 @@
     function getLeaderboardJSON(duration){
         var Httpreq = new XMLHttpRequest();
         if (duration == "monthly")
-            Httpreq.open("GET", "http://8bd47613.ngrok.io/slack/leaderboard/?q=monthly",false);
+            Httpreq.open("GET", "/slack/leaderboard/?q=monthly",false);
         else            
-            Httpreq.open("GET", "http://8bd47613.ngrok.io/slack/leaderboard/?q=weekly",false);
+            Httpreq.open("GET", "/slack/leaderboard/?q=weekly",false);
+            //Httpreq.open("GET", "http://8bd47613.ngrok.io/slack/leaderboard/?q=weekly",false);
         Httpreq.send(null);
         return Httpreq.responseText;
    }
