@@ -1,12 +1,9 @@
 from models import User, OffenceLog
 
 
-def insert_user_db(username, userid):
-    new_user, created = User.objects.get_or_create(user_name=username, user_id=userid)
-    new_user.save()
-
-
 def update_offence_db(user_id, message):
+    if not message:
+        return
     message = message.lower()
     offence = ""
     if "leaving" in message:
@@ -20,5 +17,6 @@ def update_offence_db(user_id, message):
     else:
         return
     user = User.objects.get(user_id=user_id)
+    user.save()
     new_entry = OffenceLog(user=user, offence_type=offence)
     new_entry.save()
