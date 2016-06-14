@@ -1,3 +1,4 @@
+import os
 from datetime import date, timedelta
 
 from django.http import JsonResponse
@@ -7,16 +8,22 @@ from db_utils import *
 from models import User
 
 
+TOKEN = os.environ['WEBHOOK_TOKEN']
+
+
 @csrf_exempt
-def posting(request):
+def handle_slack_post(request):
     r = request.POST
     data_span = request.GET
     if data_span:
         return JsonResponse({}, status=405, safe=False)
+    req_token = r.get('token')
+    if req_token != TOKEN:
+        return JsonResponse({}, status=403, safe=False)
     user_id = r.get('user_id')
     user_name = r.get('user_name')
     text = r.get('text')
-    if user_id == "" or user_name == "" or not user_id or not user_name:
+    if not user_id or not user_name:
         return JsonResponse({}, status=400, safe=False)
     user, created = User.objects.get_or_create(user_id=user_id,
                                                user_name=user_name)
@@ -54,4 +61,4 @@ def leaderboard(request):
             user=user['user'], offence_type="leaving_early",
             timestamp__range=[startdate, end_date])).count()
         leaderboard.append(leader)
-    return JsonResponse(leaderboard, status=302, safe=False)
+    return JsonResponse(leaderboard, status=200, safe=False)
